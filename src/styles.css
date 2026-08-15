@@ -175,7 +175,7 @@ h3 { font-size: 1rem; }
 .editor-exercise { display: flex; align-items: center; gap: 11px; padding: 13px 0; border-bottom: 1px solid var(--line); }
 .exercise-number { display: grid; place-items: center; min-width: 28px; height: 28px; border-radius: 8px; color: var(--lime); background: var(--lime-dark); font: .7rem 'DM Mono'; }
 .exercise-edit-main { flex: 1; min-width: 0; }
-.inline-fields { display: flex; gap: 7px; margin-top: 9px; }
+.inline-fields { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
 .inline-fields label { display: grid; gap: 5px; color: var(--muted); font-size: .65rem; }
 .inline-fields input { min-width: 70px; padding: 8px; }
 .add-exercise { display: flex; gap: 8px; margin-top: 15px; }
@@ -184,8 +184,12 @@ h3 { font-size: 1rem; }
 .session-page { max-width: 780px; margin: auto; }
 .session-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 31px; }
 .back-button { display: inline-flex; align-items: center; gap: 7px; background: transparent; color: var(--muted); font-size: .75rem; }
+.session-clocks { display: flex; align-items: center; gap: 20px; }
+.current-clock, .session-timer { display: grid; gap: 3px; text-align: center; }
+.current-clock { padding-right: 20px; border-right: 1px solid var(--line); }
+.current-clock span, .session-timer span, .rest-timer span { color: var(--muted); font: .6rem 'DM Mono'; letter-spacing: .12em; }
+.current-clock strong { color: var(--lime); font: 600 1.7rem 'DM Mono'; letter-spacing: .04em; }
 .session-timer { display: grid; gap: 3px; text-align: center; }
-.session-timer span, .rest-timer span { color: var(--muted); font: .6rem 'DM Mono'; letter-spacing: .12em; }
 .session-timer strong { font: 500 1.16rem 'DM Mono'; letter-spacing: .06em; }
 .finish-button { min-height: 34px; padding: 0 10px; border: 1px solid rgba(255,133,133,.28); color: var(--danger); background: transparent; font-size: .7rem; }
 .session-heading { margin-bottom: 22px; }
@@ -218,6 +222,23 @@ h3 { font-size: 1rem; }
 .rest-actions button { min-width: 36px; min-height: 31px; border-radius: 8px; color: var(--text); background: rgba(255,255,255,.08); font-size: .7rem; }
 .floating-pause { position: fixed; right: 24px; bottom: 20px; z-index: 4; display: grid; place-items: center; width: 45px; height: 45px; border-radius: 50%; color: #17200d; background: var(--lime); box-shadow: 0 8px 25px rgba(0,0,0,.25); }
 .pause-overlay { position: fixed; inset: 0; z-index: 3; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text); background: rgba(16,19,19,.82); backdrop-filter: blur(9px); font-weight: 800; }
+.workout-display-mode .topbar { display: none; }
+.workout-display-mode .page-wrap { padding-top: 28px; }
+.interval-banner { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 20px; margin-bottom: 18px; padding: 20px 22px; border: 1px solid color-mix(in srgb, var(--lime) 38%, transparent); border-radius: 18px; background: color-mix(in srgb, var(--lime) 9%, var(--surface)); box-shadow: var(--shadow); }
+.interval-banner.rest { border-color: color-mix(in srgb, var(--blue) 42%, transparent); background: color-mix(in srgb, var(--blue) 9%, var(--surface)); }
+.interval-banner > div { min-width: 0; }
+.interval-banner span, .interval-banner small { display: block; color: var(--muted); }
+.interval-banner span { font: .66rem 'DM Mono'; letter-spacing: .12em; }
+.interval-banner h2 { overflow: hidden; margin: 5px 0 3px; font-size: 1.18rem; text-overflow: ellipsis; white-space: nowrap; }
+.interval-banner > strong { color: var(--lime); font: 600 2.8rem 'DM Mono'; letter-spacing: .03em; }
+.interval-banner.rest > strong { color: var(--blue); }
+.interval-pause { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 15px; border: 1px solid var(--line); border-radius: 13px; color: var(--text); background: var(--surface-2); font-weight: 800; }
+.session-exercise.running { border-color: color-mix(in srgb, var(--lime) 52%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--lime) 22%, transparent); }
+.exercise-work-time { display: inline-flex; align-items: center; gap: 6px; color: var(--lime); font: 700 .78rem 'DM Mono'; white-space: nowrap; }
+.pause-overlay { flex-direction: column; gap: 10px; }
+.pause-overlay > span { font-size: 1.35rem; }
+.pause-overlay > strong { color: var(--lime); font: 600 4rem 'DM Mono'; }
+.pause-overlay > small { display: inline-flex; align-items: center; gap: 7px; margin-top: 5px; padding: 10px 15px; border-radius: 12px; background: var(--surface-2); font-size: .82rem; }
 .modal-backdrop { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 20px; background: rgba(0,0,0,.6); backdrop-filter: blur(6px); }
 .confirm-modal { max-width: 390px; padding: 28px; text-align: center; }
 .modal-icon { display: grid; place-items: center; width: 44px; height: 44px; margin: 0 auto 15px; border-radius: 13px; color: #17200d; background: var(--lime); }
@@ -342,3 +363,90 @@ h3 { font-size: 1rem; }
 @media (max-width: 860px) { .home-plan-columns { grid-template-columns: 1fr; }.home-plan-columns .mini-calendar { order: 2; } }
 @media (max-width: 680px) { .routine-quick-action { align-items: stretch; flex-direction: column; }.routine-quick-action .button { width: 100%; }.exercise-log-fields { grid-template-columns: 1fr 1fr; }.exercise-series-summary { grid-column: 1 / -1; justify-self: start; }.complete-exercise { padding: 8px 9px; }.complete-exercise span { display: none; } }
 @media (max-width: 680px) { .session-exercise { padding: 8px; }.session-exercise-row { gap: 5px; }.session-exercise-row .session-exercise-name h2 { font-size: .72rem; }.session-exercise-row .exercise-index { font-size: .56rem; }.session-exercise-row .exercise-weight-field, .session-exercise-row .exercise-reps-field { gap: 3px; font-size: .5rem; letter-spacing: .03em; }.session-exercise-row .exercise-weight-field input { width: 48px; padding: 7px 3px; }.session-exercise-row .exercise-reps-field input { width: 39px; padding: 7px 3px; }.session-exercise-row .exercise-series-summary { grid-column: auto; justify-self: auto; padding: 6px 4px; font-size: .55rem; }.session-exercise-row .complete-exercise { padding: 7px; } }
+@media (max-width: 680px) { .interval-banner { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 14px; }.interval-banner h2 { font-size: .92rem; }.interval-banner small { font-size: .65rem; }.interval-banner > strong { font-size: 2rem; }.interval-pause { grid-column: 1 / -1; min-height: 40px; }.exercise-work-time { gap: 3px; font-size: .58rem; }.pause-overlay > strong { font-size: 3rem; } }
+@media (max-width: 680px) { .session-clocks { gap: 8px; }.current-clock { padding-right: 8px; }.current-clock strong { font-size: 1.15rem; }.current-clock span, .session-timer span { font-size: .48rem; }.session-top .back-button { font-size: 0; }.session-top .back-button svg { width: 20px; height: 20px; } }
+
+/* Escala para entrenar mirando un monitor grande desde 1–2 metros. */
+@media (min-width: 1200px) {
+  .topbar { height: 92px; max-width: 1500px; padding: 0 36px; }
+  .brand { gap: 13px; font-size: 1.3rem; }
+  .brand-mark { width: 43px; height: 43px; border-radius: 12px; font-size: 1.08rem; }
+  .top-actions .icon-button { width: 48px; height: 48px; }
+  .page-wrap { max-width: 1500px; padding: 48px 36px 80px; }
+  .page-title { margin-bottom: 38px; }
+  .page-title h1 { font-size: clamp(3rem, 4vw, 4.2rem); }
+  .page-title .muted { max-width: 760px; margin-top: 13px; font-size: 1.08rem; }
+  .eyebrow { font-size: .78rem; }
+  .button { min-height: 52px; padding: 0 22px; border-radius: 14px; font-size: .98rem; }
+  .text-button { font-size: .95rem; }
+
+  .active-session-strip { gap: 26px; padding: 22px 24px; margin-bottom: 24px; border-radius: 20px; }
+  .active-session-copy { gap: 15px; }
+  .active-session-copy strong { font-size: 1.12rem; }
+  .active-session-time span { font-size: .72rem; }
+  .active-session-time strong { font-size: 1.5rem; }
+
+  .home-plan-columns { grid-template-columns: minmax(420px, .86fr) minmax(540px, 1.14fr); gap: 24px; }
+  .training-board, .mini-calendar { padding: 28px; border-radius: 22px; }
+  .training-board-heading h2, .mini-calendar-top h2 { font-size: 1.55rem; }
+  .routine-list-compact { gap: 10px; margin-top: 26px; }
+  .routine-compact-item { gap: 14px; padding: 18px 16px; border-radius: 14px; }
+  .routine-day { font-size: .72rem; }
+  .routine-compact-item strong { font-size: 1.12rem; }
+  .routine-quick-action { padding-top: 22px; margin-top: 22px; }
+  .calendar-session-count { font-size: .78rem; }
+  .mini-calendar-month { margin: 22px 0 17px; }
+  .mini-calendar-month > strong { font-size: 1rem; }
+  .mini-calendar-weekdays, .mini-calendar-grid { gap: 6px; }
+  .mini-calendar-weekdays { margin-bottom: 8px; font-size: .75rem; }
+  .mini-calendar-day { min-height: 54px; border-radius: 12px; font-size: .95rem; }
+  .mini-calendar-footer { padding-top: 18px; margin-top: 18px; font-size: .8rem; }
+
+  .inline-history { margin-top: 48px; }
+  .section-heading h2 { font-size: 1.55rem; }
+  .inline-history-list { gap: 11px; max-width: 900px; }
+  .inline-history-row { gap: 16px; padding: 15px 17px; border-radius: 16px; }
+  .inline-history-row .history-date { flex-basis: 56px; width: 56px; height: 56px; }
+  .inline-history-row .history-date strong { font-size: 1.2rem; }
+  .inline-history-main strong { font-size: 1.05rem; }
+  .inline-history-main small { font-size: .8rem; }
+
+  .session-page { max-width: 1360px; }
+  .session-top { margin-bottom: 38px; }
+  .back-button { font-size: 1rem; }
+  .session-timer span { font-size: .75rem; }
+  .session-timer strong { font-size: 2rem; }
+  .session-clocks { gap: 32px; }
+  .current-clock { padding-right: 32px; }
+  .current-clock span { font-size: .75rem; }
+  .current-clock strong { font-size: 3.4rem; }
+  .finish-button { min-height: 48px; padding: 0 17px; font-size: .9rem; }
+  .session-heading { margin-bottom: 30px; }
+  .session-heading h1 { font-size: clamp(3rem, 4vw, 4rem); }
+  .session-heading .muted { font-size: 1.05rem; }
+  .interval-banner { gap: 32px; padding: 24px 28px; border-radius: 22px; }
+  .interval-banner span { font-size: .78rem; }
+  .interval-banner h2 { font-size: 1.7rem; }
+  .interval-banner small { font-size: .9rem; }
+  .interval-banner > strong { min-width: 180px; text-align: center; font-size: 5rem; }
+  .interval-pause { min-height: 58px; padding: 0 21px; font-size: 1rem; }
+  .session-exercise { padding: 15px 18px; margin-bottom: 12px; border-radius: 16px; }
+  .session-exercise-row { gap: 16px; }
+  .session-exercise-name { gap: 14px; }
+  .session-exercise-row .exercise-index { font-size: .85rem; }
+  .session-exercise-row .session-exercise-name h2 { font-size: 1.35rem; }
+  .session-exercise-row .exercise-weight-field, .session-exercise-row .exercise-reps-field { gap: 8px; font-size: .72rem; }
+  .session-exercise-row .exercise-weight-field input { width: 96px; min-height: 50px; padding: 10px 8px; font-size: 1.15rem; }
+  .session-exercise-row .exercise-reps-field input { width: 76px; min-height: 50px; padding: 10px 8px; font-size: 1.15rem; }
+  .session-exercise-row .exercise-work-time { font-size: 1.05rem; }
+  .session-exercise-row .exercise-series-summary { padding: 10px 12px; font-size: .85rem; }
+  .session-exercise-row .complete-exercise { min-height: 50px; padding: 0 16px; font-size: .92rem; }
+  .session-note label span { font-size: .88rem; }
+  .session-note textarea { min-height: 84px; font-size: 1rem; }
+  .rest-timer { right: 34px; bottom: 112px; padding: 20px 22px; }
+  .rest-timer strong { font-size: 2rem; }
+  .floating-pause { right: 34px; bottom: 34px; width: 60px; height: 60px; }
+  .pause-overlay > span { font-size: 2rem; }
+  .pause-overlay > strong { font-size: 7rem; }
+  .pause-overlay > small { padding: 14px 20px; font-size: 1rem; }
+}

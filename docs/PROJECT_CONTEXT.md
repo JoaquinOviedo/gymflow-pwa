@@ -108,6 +108,10 @@ Si se cambia el formato aceptado, actualizar `src/importExcel.ts` y los tests de
 - El tema se resuelve desde `state.settings.theme` y se aplica como `data-theme` sobre `<html>`.
 - `light` y `dark` usan variables CSS; `system` escucha `prefers-color-scheme`.
 - El botón superior alterna directamente entre claro y oscuro; Ajustes conserva las tres opciones.
+- A partir de 1200 px de ancho se activa automáticamente una escala de gimnasio para lectura a 1–2 metros: aumenta títulos, controles, timer, rutinas, calendario e historial. La versión móvil conserva su escala compacta.
+- Al entrar en una sesión se activa el modo de visualización de entrenamiento: se oculta la cabecera general y se priorizan la hora actual, el tiempo de sesión y la actividad en curso.
+- Cada ejercicio puede tener `workSeconds`. En ese caso, la app cuenta cada serie, completa la serie al llegar a cero, ejecuta `restSeconds` y continúa con la siguiente serie o ejercicio cronometrado. Los cambios se anuncian por voz cuando está habilitado el sonido de descanso.
+- La sesión puede pausarse desde el botón visible o con la barra espaciadora. La pausa congela el tiempo general y cualquier cuenta regresiva hasta continuar.
 - `public/manifest.webmanifest` declara el modo standalone y el color de acento lime.
 - `public/sw.js` cachea la raíz y recursos solicitados. Si se cambia la estrategia de cache o el nombre de cache, probar una instalación existente y considerar un nuevo nombre de cache.
 

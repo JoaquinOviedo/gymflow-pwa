@@ -8,7 +8,30 @@ const text = (value: unknown) => value === null || value === undefined ? '' : St
 const isDayHeader = (value: string) => /^dia\s*\d+/i.test(value)
 const isSectionHeader = (value: string) => /^(variantes de ejercicios|ejercicios eliminados)$/i.test(value)
 const extractWeight = (value: unknown) => { if (typeof value === 'number' && Number.isFinite(value)) return value; const raw = text(value); return /^\s*\d+(?:[.,]\d+)?\s*(?:kg)?\s*$/i.test(raw) ? Number(raw.replace(',', '.').replace(/kg/i, '').trim()) : undefined }
-const extractPrescription = (name: string) => { const match = name.match(/(\d+)\s*[x×]\s*(\d+)/i); const duration = name.match(/(\d+(?:[.,]\d+)?)\s*(?:'|”|"|min)/i); return { targetSets: match ? Math.max(1, Number(match[1])) : 3, repMin: match ? Number(match[2]) : duration ? 1 : 8, repMax: match ? Number(match[2]) : duration ? 1 : 12, label: name.replace(/\s*\d+\s*[x×]\s*\d+\s*/i, ' ').replace(/\s+/g, ' ').trim() } }
+const durationInSeconds = (value: string, unit: string) => {
+  const amount = Number(value.replace(',', '.'))
+  return Math.max(1, Math.round(/^(?:s|seg)/i.test(unit) ? amount : amount * 60))
+}
+
+const extractPrescription = (name: string) => {
+  const timedSets = name.match(/(\d+)\s*[x×]\s*(\d+(?:[.,]\d+)?)\s*(seg(?:undos?)?|s|min(?:utos?)?|'|”|")/i)
+  const reps = timedSets ? undefined : name.match(/(\d+)\s*[x×]\s*(\d+)/i)
+  const duration = timedSets ? undefined : name.match(/(\d+(?:[.,]\d+)?)\s*(seg(?:undos?)?|s|min(?:utos?)?|'|”|")/i)
+  const matchedText = timedSets?.[0] ?? reps?.[0] ?? duration?.[0]
+  const workSeconds = timedSets
+    ? durationInSeconds(timedSets[2], timedSets[3])
+    : duration
+      ? durationInSeconds(duration[1], duration[2])
+      : undefined
+
+  return {
+    targetSets: timedSets ? Math.max(1, Number(timedSets[1])) : reps ? Math.max(1, Number(reps[1])) : duration ? 1 : 3,
+    repMin: reps ? Number(reps[2]) : workSeconds ? 1 : 8,
+    repMax: reps ? Number(reps[2]) : workSeconds ? 1 : 12,
+    workSeconds,
+    label: (matchedText ? name.replace(matchedText, ' ') : name).replace(/\s+/g, ' ').trim()
+  }
+}
 
 function findOrCreateExercise(name: string, exercises: Exercise[]) {
   const key = normalize(name).replace(/\b(mc|scott|polea|banda|maquina|máquina)\b/g, '').replace(/\s+/g, ' ').trim()
@@ -32,7 +55,7 @@ function buildRoutine(name: string, rows: unknown[][], exerciseColumn: number, l
     const parsed = extractPrescription(rawName); if (!parsed.label) continue
     const load = text(rows[row]?.[loadColumn]); const current = currentColumn === undefined ? '' : text(rows[row]?.[currentColumn]); const exercise = findOrCreateExercise(parsed.label, exercises)
     const startingWeight = extractWeight(rows[row]?.[currentColumn ?? loadColumn]) ?? extractWeight(rows[row]?.[loadColumn])
-    routineExercises.push({ exerciseId: exercise.id, order: routineExercises.length, targetSets: parsed.targetSets, repMin: parsed.repMin, repMax: parsed.repMax, restSeconds: /estiramiento|stretch|cardio|bici|calentamiento|vuelta en calma/i.test(parsed.label) ? 45 : 90, startingWeight, startingLoad: current || load, notes: current && load && current !== load ? `Plan: ${load}. Peso actual: ${current}.` : load ? `Plan: ${load}.` : undefined })
+    routineExercises.push({ exerciseId: exercise.id, order: routineExercises.length, targetSets: parsed.targetSets, repMin: parsed.repMin, repMax: parsed.repMax, restSeconds: /estiramiento|stretch|cardio|bici|calentamiento|vuelta en calma/i.test(parsed.label) ? 45 : 90, workSeconds: parsed.workSeconds, startingWeight, startingLoad: current || load, notes: current && load && current !== load ? `Plan: ${load}. Peso actual: ${current}.` : load ? `Plan: ${load}.` : undefined })
   }
   return routineExercises.length ? { id: uid('routine'), name, description: 'Importada desde tu plan de Excel.', exercises: routineExercises, createdAt: new Date().toISOString() } : undefined
 }

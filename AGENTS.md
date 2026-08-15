@@ -13,6 +13,8 @@ Las prioridades de UX son, en este orden:
 3. Mantener la sesión activa compacta: cada ejercicio se registra en una sola fila, con un peso y una cantidad de reps para todas sus series.
 4. Permitir importar el plan de Excel sin reescribirlo manualmente.
 5. Mantener el historial y la eliminación de entrenamientos accesibles sin convertirlos en el centro de la app.
+6. En pantallas de 1200 px o más, mantener la escala de gimnasio legible a 1–2 metros sin romper la fila única de ejercicios.
+7. Durante una sesión cronometrada, mostrar en grande la hora actual y el intervalo, avanzar automáticamente entre trabajo/descanso y permitir pausar todo el flujo.
 
 No reintroducir barra de navegación inferior, dashboard de métricas, pantallas separadas de calendario/progreso o listas extensas de ejercicios salvo que Joaquín lo pida expresamente.
 
@@ -31,7 +33,10 @@ No reintroducir barra de navegación inferior, dashboard de métricas, pantallas
 - Si se agrega un campo obligatorio a `AppState`, actualizar la carga de datos antiguos y la importación de backups; `loadState` no hace migraciones automáticas.
 - La apariencia usa variables CSS en `src/styles.css`. Mantener funcionando `light`, `dark` y `system`, incluyendo el `data-theme` del elemento raíz.
 - Cualquier cambio al modelo de sesión debe conservar el cálculo de PRs, volumen, eliminación de sesiones y el comportamiento de una sola carga/reps por ejercicio.
+- `workSeconds` es opcional por ejercicio de rutina. Cuando está definido, cada serie usa cuenta regresiva y la sesión puede avanzar sin interacción; `restSeconds` controla la pausa automática entre series y ejercicios.
+- La pausa real se guarda en `activeSession.pausedAt`: debe congelar sesión, trabajo y descanso, y descontarse de la duración final.
 - Los cambios de UX deben conservar el calendario visible en Inicio y el flujo rápido de entrenamiento.
+- Los estilos de escritorio grande viven en el bloque `@media (min-width: 1200px)` al final de `src/styles.css`; validar siempre que nombres, peso, reps, series y completar sigan en una sola fila.
 - La importación de Excel se carga de forma diferida. No importar `xlsx` en el arranque salvo que sea necesario.
 - Las funciones de cámara procesan el video localmente y no deben guardar ni enviar el video.
 - Preferir cambios pequeños y legibles. `src/App.tsx` es actualmente un archivo denso; localizar el componente por nombre antes de editarlo y evitar reescrituras masivas.

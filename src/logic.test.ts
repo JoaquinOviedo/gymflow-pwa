@@ -47,7 +47,7 @@ describe('biceps curl analyzer', () => {
 describe('Excel routine import', () => {
   it('turns day blocks into routines and keeps current weight', async () => {
     const workbook = XLSX.utils.book_new()
-    const sheet = XLSX.utils.aoa_to_sheet([['Dia 1', 'PB', 'Peso Actual'], ['Press de pecho 4x10', '16kg', 16], ['Curl de biceps 3x12', '8kg', 7], [], ['Variantes de Ejercicios'], ['Remo foca 4x10', '18kg'], [], ['Ejercicios eliminados'], ['Dominadas en anillas N al fallo', 'Sin peso']])
+    const sheet = XLSX.utils.aoa_to_sheet([['Dia 1', 'PB', 'Peso Actual'], ['Press de pecho 4x10', '16kg', 16], ['Curl de biceps 3x12', '8kg', 7], ['Plancha 3x30 seg'], ['Bicicleta 10 min'], [], ['Variantes de Ejercicios'], ['Remo foca 4x10', '18kg'], [], ['Ejercicios eliminados'], ['Dominadas en anillas N al fallo', 'Sin peso']])
     XLSX.utils.book_append_sheet(workbook, sheet, 'Plan')
     const buffer = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' }) as ArrayBuffer
     const file = { name: 'plan.xlsx', arrayBuffer: async () => buffer } as unknown as File
@@ -55,6 +55,9 @@ describe('Excel routine import', () => {
     expect(result.routines).toHaveLength(1)
     expect(result.routines[0].name).toBe('Día 1')
     expect(result.routines[0].exercises[0].startingWeight).toBe(16)
+    expect(result.routines[0].exercises[2]).toMatchObject({ targetSets: 3, workSeconds: 30 })
+    expect(result.routines[0].exercises[3]).toMatchObject({ targetSets: 1, workSeconds: 600 })
+    expect(result.exercises.some((exercise) => exercise.name === 'Plancha')).toBe(true)
     expect(result.exercises.some((exercise) => exercise.name === 'Remo foca')).toBe(true)
     expect(result.exercises.some((exercise) => exercise.name.includes('Dominadas'))).toBe(false)
   })

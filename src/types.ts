@@ -11,7 +11,7 @@ export interface ExerciseSet { id: string; exerciseId: string; setNumber: number
 export interface SessionExercise { exerciseId: string; sets: ExerciseSet[] }
 export interface WorkoutSession { id: string; routineId: string; date: string; startedAt: string; endedAt?: string; durationSeconds: number; exercises: SessionExercise[]; notes: string; completed: boolean }
 export type RecordType = 'weight' | 'reps' | 'volume' | 'estimated1RM'
-export interface PersonalRecord { id: string; exerciseId: string; type: RecordType; value: number; weight: number; reps: number; date: string }
+export interface PersonalRecord { id: string; exerciseId: string; type: RecordType; value: number; weight: number; reps: number; date: string; sessionId?: string }
 export interface BodyWeightEntry { id: string; date: string; weight: number }
 export interface TechniqueAnalysis { id: string; exerciseId: string; date: string; reps: number; quality?: number; metrics: Record<string, number>; errors: string[]; observations: string[] }
 export interface ActiveSession { sessionId: string; startedAt: string; pausedAt?: string; pausedSeconds: number }

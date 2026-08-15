@@ -15,8 +15,9 @@ describe('training calculations', () => {
   })
 
   it('detects only records that beat the existing history', () => {
-    const records = detectNewRecords('curl', [set(12, 10)], [], '2026-08-15')
+    const records = detectNewRecords('curl', [set(12, 10)], [], '2026-08-15', 'session-1')
     expect(records.map((record) => record.type)).toEqual(['weight', 'reps', 'volume', 'estimated1RM'])
+    expect(records.every((record) => record.sessionId === 'session-1')).toBe(true)
     expect(detectNewRecords('curl', [set(12, 10)], records, '2026-08-16')).toHaveLength(0)
   })
 

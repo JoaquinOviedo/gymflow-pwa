@@ -26,3 +26,15 @@ iniciar_gymflow.bat
 ```
 
 Los datos de entrenamiento permanecen locales en IndexedDB. El video de cámara no se guarda.
+
+## Desarrollo
+
+```bash
+npm install
+npm run dev
+npm run lint
+npm run test
+npm run build
+```
+
+La guía para futuras modificaciones está en [`AGENTS.md`](AGENTS.md) y el contexto técnico completo en [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md). La experiencia actual prioriza Inicio y Sesión activa; el calendario se muestra dentro de Inicio y la edición/importación de rutinas se abre como panel.

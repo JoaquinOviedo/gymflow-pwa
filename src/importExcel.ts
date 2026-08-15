@@ -1,4 +1,3 @@
-import * as XLSX from 'xlsx'
 import type { Exercise, RoutineExercise, WorkoutRoutine } from './types'
 import { uid } from './utils'
 
@@ -39,6 +38,7 @@ function buildRoutine(name: string, rows: unknown[][], exerciseColumn: number, l
 }
 
 export async function parseWorkoutWorkbook(file: File): Promise<ExcelImportResult> {
+  const XLSX = await import('xlsx')
   const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true })
   const exercises: Exercise[] = []
   const routines: WorkoutRoutine[] = []

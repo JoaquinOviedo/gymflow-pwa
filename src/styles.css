@@ -307,6 +307,14 @@ h3 { font-size: 1rem; }
 .exercise-reps-field { display: grid; gap: 5px; color: var(--muted); font: .59rem 'DM Mono'; letter-spacing: .08em; }
 .exercise-reps-field input { width: 100%; box-sizing: border-box; padding: 8px 7px; text-align: center; }
 .exercise-series-summary { justify-self: end; padding: 7px 9px; border-radius: 7px; color: var(--muted); background: var(--surface-2); font: .63rem 'DM Mono'; }
+.session-exercise { padding: 10px 12px; margin-bottom: 7px; }
+.session-exercise-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto auto; align-items: center; gap: 9px; }
+.session-exercise-row .session-exercise-name h2 { font-size: .82rem; }
+.session-exercise-row .exercise-weight-field, .session-exercise-row .exercise-reps-field { display: flex; align-items: center; gap: 5px; min-width: 0; white-space: nowrap; }
+.session-exercise-row .exercise-weight-field input { width: 68px; padding: 7px 5px; }
+.session-exercise-row .exercise-reps-field input { width: 52px; padding: 7px 5px; }
+.session-exercise-row .exercise-series-summary { justify-self: auto; white-space: nowrap; }
+.session-exercise-row .complete-exercise { padding: 7px 9px; }
 .routine-panel { width: min(1100px, 100%); max-height: calc(100vh - 40px); padding: 24px; overflow-y: auto; border: 1px solid var(--line); border-radius: 20px; background: var(--bg); }
 .routine-panel-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
 .routine-panel-top h2 { margin-bottom: 7px; font-size: 1.35rem; }
@@ -333,3 +341,4 @@ h3 { font-size: 1rem; }
 @media (max-width: 680px) { .settings-panel { max-height: calc(100vh - 24px); padding: 16px; border-radius: 16px; } }
 @media (max-width: 860px) { .home-plan-columns { grid-template-columns: 1fr; }.home-plan-columns .mini-calendar { order: 2; } }
 @media (max-width: 680px) { .routine-quick-action { align-items: stretch; flex-direction: column; }.routine-quick-action .button { width: 100%; }.exercise-log-fields { grid-template-columns: 1fr 1fr; }.exercise-series-summary { grid-column: 1 / -1; justify-self: start; }.complete-exercise { padding: 8px 9px; }.complete-exercise span { display: none; } }
+@media (max-width: 680px) { .session-exercise { padding: 8px; }.session-exercise-row { gap: 5px; }.session-exercise-row .session-exercise-name h2 { font-size: .72rem; }.session-exercise-row .exercise-index { font-size: .56rem; }.session-exercise-row .exercise-weight-field, .session-exercise-row .exercise-reps-field { gap: 3px; font-size: .5rem; letter-spacing: .03em; }.session-exercise-row .exercise-weight-field input { width: 48px; padding: 7px 3px; }.session-exercise-row .exercise-reps-field input { width: 39px; padding: 7px 3px; }.session-exercise-row .exercise-series-summary { grid-column: auto; justify-self: auto; padding: 6px 4px; font-size: .55rem; }.session-exercise-row .complete-exercise { padding: 7px; } }

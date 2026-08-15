@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { detectNewRecords, sessionVolume } from './analytics'
 import { BicepsCurlAnalyzer, type PoseFrame } from './technique'
+import { parseWorkoutWorkbook } from './importExcel'
+import * as XLSX from 'xlsx'
 import type { ExerciseSet, WorkoutSession } from './types'
 import { estimatedOneRepMax, isSameWeek, volume } from './utils'
 
@@ -38,5 +40,21 @@ describe('biceps curl analyzer', () => {
     const result = analyzer.analyze(pose('down'))
     expect(result.reps).toBe(1)
     expect(analyzer.analyze(pose('down')).reps).toBe(1)
+  })
+})
+
+describe('Excel routine import', () => {
+  it('turns day blocks into routines and keeps current weight', async () => {
+    const workbook = XLSX.utils.book_new()
+    const sheet = XLSX.utils.aoa_to_sheet([['Dia 1', 'PB', 'Peso Actual'], ['Press de pecho 4x10', '16kg', 16], ['Curl de biceps 3x12', '8kg', 7], [], ['Variantes de Ejercicios'], ['Remo foca 4x10', '18kg'], [], ['Ejercicios eliminados'], ['Dominadas en anillas N al fallo', 'Sin peso']])
+    XLSX.utils.book_append_sheet(workbook, sheet, 'Plan')
+    const buffer = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' }) as ArrayBuffer
+    const file = { name: 'plan.xlsx', arrayBuffer: async () => buffer } as unknown as File
+    const result = await parseWorkoutWorkbook(file)
+    expect(result.routines).toHaveLength(1)
+    expect(result.routines[0].name).toBe('Día 1')
+    expect(result.routines[0].exercises[0].startingWeight).toBe(16)
+    expect(result.exercises.some((exercise) => exercise.name === 'Remo foca')).toBe(true)
+    expect(result.exercises.some((exercise) => exercise.name.includes('Dominadas'))).toBe(false)
   })
 })

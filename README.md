@@ -2,6 +2,8 @@
 
 PWA personal de gimnasio con rutinas, sesiones, PRs, calendario, progreso, peso corporal y análisis local de técnica.
 
+También podés importar una rutina desde un archivo `.xlsx`: GymFlow reconoce bloques como `Día 1`, `Día 2`, `Día 3`, cardio/movilidad y estiramiento. Las variantes se agregan como ejercicios disponibles; los ejercicios marcados como eliminados no se activan.
+
 ## Uso en Windows
 
 El acceso directo `GymFlow.lnk` abre `iniciar_gymflow.vbs`, que ejecuta el lanzador sin mostrar una consola. El lanzador:

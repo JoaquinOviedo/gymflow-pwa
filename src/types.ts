@@ -5,7 +5,7 @@ export type Page = 'dashboard' | 'routines' | 'session' | 'calendar' | 'progress
 
 export interface ExerciseAnalysisConfig { recommendedOrientation: string; requiredLandmarks: string[] }
 export interface Exercise { id: string; name: string; muscleGroup: MuscleGroup; description: string; instructions: string[]; type: 'strength' | 'bodyweight'; loadUnit: LoadUnit; cameraEnabled: boolean; analysis?: ExerciseAnalysisConfig; custom?: boolean }
-export interface RoutineExercise { exerciseId: string; order: number; targetSets: number; repMin: number; repMax: number; restSeconds: number; notes?: string }
+export interface RoutineExercise { exerciseId: string; order: number; targetSets: number; repMin: number; repMax: number; restSeconds: number; notes?: string; startingWeight?: number; startingLoad?: string }
 export interface WorkoutRoutine { id: string; name: string; description: string; exercises: RoutineExercise[]; createdAt: string }
 export interface ExerciseSet { id: string; exerciseId: string; setNumber: number; reps: number; weight: number; rir?: number; completed: boolean; timestamp: string }
 export interface SessionExercise { exerciseId: string; sets: ExerciseSet[] }

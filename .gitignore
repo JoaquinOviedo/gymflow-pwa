@@ -5,6 +5,7 @@ vite.config.js
 vite.config.d.ts
 .gymflow-server.log
 .gymflow-server-error.log
+.xlsx-tool/
 .env
 .env.*
 !.env.example

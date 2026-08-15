@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useRef, useState } from 'react'
 import { Activity, ArrowLeft, BarChart3, CalendarDays, Camera, Check, ChevronDown, CircleHelp, Clock3, Dumbbell, Download, Flame, History, Moon, Pause, Play, Plus, RotateCcw, Settings, Square, Sun, Trash2, Trophy, Upload, Video, X, Zap } from 'lucide-react'
-import type { AppSettings, AppState, BodyWeightEntry, ExerciseSet, Page, RoutineExercise, TechniqueAnalysis, WorkoutRoutine, WorkoutSession } from './types'
+import type { AppSettings, AppState, BodyWeightEntry, Page, RoutineExercise, TechniqueAnalysis, WorkoutRoutine, WorkoutSession } from './types'
 import { loadState, saveState } from './db'
 import { defaultState } from './seed'
 import { detectNewRecords, sessionVolume } from './analytics'
@@ -65,7 +65,6 @@ function Dashboard({ state, activeSession, navigate, startSession, openPlan, del
   const activeRoutine = activeSession ? state.routines.find((routine) => routine.id === activeSession.routineId) : undefined
   const active = state.activeSession
   const activeElapsed = active ? Math.max(0, Math.floor((now - Date.parse(active.startedAt)) / 1000) - active.pausedSeconds) : 0
-  const exerciseName = (id: string) => state.exercises.find((exercise) => exercise.id === id)?.name ?? 'Ejercicio'
 
   useEffect(() => {
     if (!active) return
@@ -80,8 +79,10 @@ function Dashboard({ state, activeSession, navigate, startSession, openPlan, del
   return <>
     <PageTitle eyebrow="HOY" title="Tu entrenamiento" description="Elegí un día, mirá tu plan y empezá." />
     {activeSession && <section className="active-session-strip card"><div className="active-session-copy"><span className="pulse-dot" /><div><p className="eyebrow lime">SESIÓN EN CURSO</p><strong>{activeRoutine?.name ?? 'Rutina'}</strong></div></div><div className="active-session-time"><span>TIEMPO</span><strong>{formatDuration(activeElapsed)}</strong></div><button className="button primary" onClick={() => navigate('session')}><Play size={16} fill="currentColor" /> Continuar</button></section>}
-    {state.routines.length ? <section className="training-board card"><div className="training-board-heading"><div><p className="eyebrow lime">PLAN DE ENTRENAMIENTO</p><h2>¿Qué toca hoy?</h2></div><button className="text-button" onClick={openPlan}>Editar plan</button></div><div className="routine-tabs" role="tablist" aria-label="Días de entrenamiento">{state.routines.map((routine, index) => <button key={routine.id} className={routine.id === selectedRoutine?.id ? 'routine-tab selected' : 'routine-tab'} onClick={() => setSelectedRoutineId(routine.id)} role="tab" aria-selected={routine.id === selectedRoutine?.id}><span>Día {String(index + 1).padStart(2, '0')}</span><strong>{routine.name}</strong><small>{routine.exercises.length} ejercicios</small></button>)}</div>{selectedRoutine && <div className="selected-routine"><div className="selected-routine-heading"><div><span className="routine-tag">{selectedRoutine.exercises.length} ejercicios</span><h3>{selectedRoutine.name}</h3><p className="muted">{selectedRoutine.description}</p></div><button className="button primary quick-start-button" onClick={() => activeSession ? navigate('session') : startSession(selectedRoutine.id)}><Play size={16} fill="currentColor" /> {activeSession ? 'Continuar sesión' : 'Comenzar rápido'}</button></div>{selectedRoutine.exercises.length ? <div className="exercise-sheet"><div className="exercise-sheet-head"><span>Ejercicio</span><span>Series / reps</span><span>Carga inicial</span></div>{selectedRoutine.exercises.slice().sort((a, b) => a.order - b.order).map((item, index) => <div className="exercise-sheet-row" key={selectedRoutine.id + '-' + item.exerciseId + '-' + index}><div><span className="exercise-number">{String(index + 1).padStart(2, '0')}</span><strong>{exerciseName(item.exerciseId)}</strong></div><small>{item.targetSets} × {item.repMin}-{item.repMax}</small><small>{item.startingWeight ? formatNumber(item.startingWeight) + ' kg' : item.startingLoad ?? '—'}</small></div>)}</div> : <p className="muted empty-routine-note">Este día todavía no tiene ejercicios.</p>}</div>}</section> : <section className="section-block"><EmptyState icon={Dumbbell} title="Todavía no tenés una rutina" text="Importá tu Excel o creá una rutina corta para empezar." action={<button className="button secondary" onClick={openPlan}>Agregar rutina</button>} /></section>}
-    <div className="dashboard-calendar"><MiniCalendar state={state} weekSessions={weekSessions} weekTime={weekTime} /></div>
+    <div className="home-plan-columns">
+      {state.routines.length ? <section className="training-board card"><div className="training-board-heading"><div><p className="eyebrow lime">PLAN DE ENTRENAMIENTO</p><h2>¿Qué toca hoy?</h2></div><button className="text-button" onClick={openPlan}>Editar plan</button></div><div className="routine-list-compact" role="tablist" aria-label="Días de entrenamiento">{state.routines.map((routine, index) => <button key={routine.id} className={routine.id === selectedRoutine?.id ? 'routine-compact-item selected' : 'routine-compact-item'} onClick={() => setSelectedRoutineId(routine.id)} role="tab" aria-selected={routine.id === selectedRoutine?.id}><span className="routine-day">Día {String(index + 1).padStart(2, '0')}</span><strong>{routine.name}</strong><ChevronDown className="routine-compact-arrow" size={15} /></button>)}</div>{selectedRoutine && <div className="routine-quick-action"><button className="button primary quick-start-button" onClick={() => activeSession ? navigate('session') : startSession(selectedRoutine.id)}><Play size={16} fill="currentColor" /> {activeSession ? 'Continuar sesión' : 'Comenzar rápido'}</button></div>}</section> : <section className="home-routine-empty card"><EmptyState icon={Dumbbell} title="Todavía no tenés una rutina" text="Importá tu Excel o creá una rutina corta para empezar." action={<button className="button secondary" onClick={openPlan}>Agregar rutina</button>} /></section>}
+      <MiniCalendar state={state} weekSessions={weekSessions} weekTime={weekTime} />
+    </div>
     <InlineHistory state={state} deleteSession={deleteSession} />
   </>
 }
@@ -166,35 +167,30 @@ function SessionView({ state, session, updateSession, finishSession, navigate }:
   const active = state.activeSession
   const elapsed = active ? Math.max(0, Math.floor((now - Date.parse(active.startedAt)) / 1000) - active.pausedSeconds) : 0
   const routine = state.routines.find((item) => item.id === session.routineId)
-  const allDone = session.exercises.length > 0 && session.exercises.every((item) => item.sets.some((set) => set.completed))
+  const allDone = session.exercises.length > 0 && session.exercises.every((item) => item.sets.length > 0 && item.sets.every((set) => set.completed))
 
-  const setValue = (exerciseId: string, setId: string, patch: Partial<ExerciseSet>) => updateSession(session.id, (item) => ({ ...item, exercises: item.exercises.map((exercise) => exercise.exerciseId === exerciseId ? { ...exercise, sets: exercise.sets.map((set) => set.id === setId ? { ...set, ...patch, timestamp: new Date().toISOString() } : set) } : exercise) }))
   const setExerciseWeight = (exerciseId: string, weight: number) => updateSession(session.id, (item) => ({ ...item, exercises: item.exercises.map((exercise) => exercise.exerciseId === exerciseId ? { ...exercise, sets: exercise.sets.map((set) => ({ ...set, weight })) } : exercise) }))
-  const toggleSet = (exerciseId: string, set: ExerciseSet) => {
-    const completed = !set.completed
-    setValue(exerciseId, set.id, { completed })
+  const setExerciseReps = (exerciseId: string, reps: number) => updateSession(session.id, (item) => ({ ...item, exercises: item.exercises.map((exercise) => exercise.exerciseId === exerciseId ? { ...exercise, sets: exercise.sets.map((set) => ({ ...set, reps, timestamp: new Date().toISOString() })) } : exercise) }))
+  const toggleExercise = (exerciseId: string, completed: boolean) => {
+    updateSession(session.id, (item) => ({ ...item, exercises: item.exercises.map((exercise) => exercise.exerciseId === exerciseId ? { ...exercise, sets: exercise.sets.map((set) => ({ ...set, completed, timestamp: new Date().toISOString() })) } : exercise) }))
     if (completed && state.settings.autoRest) setRest(routine?.exercises.find((item) => item.exerciseId === exerciseId)?.restSeconds ?? 90)
   }
-  const addSet = (exerciseId: string) => updateSession(session.id, (item) => ({ ...item, exercises: item.exercises.map((exercise) => exercise.exerciseId === exerciseId ? { ...exercise, sets: [...exercise.sets, { id: uid('set'), exerciseId, setNumber: exercise.sets.length + 1, reps: 0, weight: exercise.sets[0]?.weight ?? 0, completed: false, timestamp: new Date().toISOString() }] } : exercise) }))
-  const removeSet = (exerciseId: string, setId: string) => updateSession(session.id, (item) => ({ ...item, exercises: item.exercises.map((exercise) => exercise.exerciseId === exerciseId ? { ...exercise, sets: exercise.sets.filter((set) => set.id !== setId).map((set, index) => ({ ...set, setNumber: index + 1 })) } : exercise) }))
 
   return <div className="session-page">
     <div className="session-top"><button className="back-button" onClick={() => navigate('dashboard')}><ArrowLeft size={18} /> Salir</button><div className="session-timer"><span>TIEMPO</span><strong>{formatDuration(elapsed)}</strong></div><button className="button finish-button" onClick={() => setConfirmFinish(true)}><Square size={14} fill="currentColor" /> Finalizar</button></div>
-    <div className="session-heading"><p className="eyebrow lime">EN CURSO</p><h1>{routine?.name}</h1><p className="muted">{session.exercises.filter((item) => item.sets.some((set) => set.completed)).length} de {session.exercises.length} ejercicios con series registradas</p></div>
+    <div className="session-heading"><p className="eyebrow lime">EN CURSO</p><h1>{routine?.name}</h1><p className="muted">{session.exercises.filter((item) => item.sets.length > 0 && item.sets.every((set) => set.completed)).length} de {session.exercises.length} ejercicios completados · mismo peso y reps por serie</p></div>
     {session.exercises.map((item, index) => {
       const exercise = state.exercises.find((candidate) => candidate.id === item.exerciseId)
-      const prescription = routine?.exercises.find((candidate) => candidate.exerciseId === item.exerciseId)
       const exerciseWeight = item.sets[0]?.weight ?? 0
+      const exerciseReps = item.sets[0]?.reps ?? 0
+      const exerciseDone = item.sets.length > 0 && item.sets.every((set) => set.completed)
       return <section className="session-exercise card" key={item.exerciseId}>
-        <div className="session-exercise-heading"><div><span className="exercise-index">{String(index + 1).padStart(2, '0')}</span><h2>{exercise?.name}</h2><p className="muted">{prescription ? prescription.targetSets + ' series · ' + prescription.repMin + '-' + prescription.repMax + ' reps' : 'Registrá las series de este ejercicio'}</p></div><label className="exercise-weight-field"><span>PESO {state.settings.unit.toUpperCase()}</span><input type="number" min="0" inputMode="decimal" placeholder="0" value={exerciseWeight || ''} onChange={(event) => setExerciseWeight(item.exerciseId, Number(event.target.value))} /></label></div>
-        <p className="same-weight-note">Mismo peso para todas las series</p>
-        <div className="set-header same-weight"><span>SERIE</span><span>REPS</span><span></span><span></span></div>
-        {item.sets.map((set) => <div className={set.completed ? 'set-row same-weight completed' : 'set-row same-weight'} key={set.id}><strong>{set.setNumber}</strong><input type="number" min="0" inputMode="numeric" placeholder="0" value={set.reps || ''} onChange={(event) => setValue(item.exerciseId, set.id, { reps: Number(event.target.value) })} /><button className={set.completed ? 'complete-set active' : 'complete-set'} onClick={() => toggleSet(item.exerciseId, set)} aria-label="Completar serie"><Check size={17} /></button><button className="row-delete" onClick={() => removeSet(item.exerciseId, set.id)} aria-label="Eliminar serie"><X size={14} /></button></div>)}
-        <button className="add-set" onClick={() => addSet(item.exerciseId)}><Plus size={15} /> Agregar serie</button>
+        <div className="session-exercise-heading"><div className="session-exercise-name"><span className="exercise-index">{String(index + 1).padStart(2, '0')}</span><h2>{exercise?.name}</h2></div><button className={exerciseDone ? 'complete-exercise active' : 'complete-exercise'} onClick={() => toggleExercise(item.exerciseId, !exerciseDone)} aria-label={exerciseDone ? 'Marcar ejercicio como pendiente' : 'Marcar ejercicio como completo'}><Check size={16} /><span>{exerciseDone ? 'Listo' : 'Completar'}</span></button></div>
+        <div className="exercise-log-fields"><label className="exercise-weight-field"><span>PESO {state.settings.unit.toUpperCase()}</span><input type="number" min="0" inputMode="decimal" placeholder="0" value={exerciseWeight || ''} onChange={(event) => setExerciseWeight(item.exerciseId, Number(event.target.value))} /></label><label className="exercise-reps-field"><span>REPS</span><input type="number" min="0" inputMode="numeric" placeholder="0" value={exerciseReps || ''} onChange={(event) => setExerciseReps(item.exerciseId, Number(event.target.value))} /></label><span className="exercise-series-summary">{item.sets.length} series</span></div>
       </section>
     })}
     <div className="session-note"><label><span>Notas de la sesión</span><textarea value={session.notes} placeholder="¿Cómo te sentiste?" onChange={(event) => updateSession(session.id, (item) => ({ ...item, notes: event.target.value }))} rows={2} /></label></div>
-    <button className="button lime-button wide" onClick={() => setConfirmFinish(true)} disabled={!allDone}><Check size={18} /> {allDone ? 'Guardar y finalizar' : 'Completá al menos una serie por ejercicio'}</button>
+    <button className="button lime-button wide" onClick={() => setConfirmFinish(true)} disabled={!allDone}><Check size={18} /> {allDone ? 'Guardar y finalizar' : 'Completá todos los ejercicios'}</button>
     {rest !== undefined && <RestTimer seconds={rest} setSeconds={setRest} onClose={() => setRest(undefined)} />}
     {confirmFinish && <div className="modal-backdrop"><div className="confirm-modal card"><div className="modal-icon"><Check /></div><h2>¿Terminaste?</h2><p className="muted">Se guardarán {session.exercises.reduce((sum, item) => sum + item.sets.filter((set) => set.completed).length, 0)} series y el tiempo de esta sesión.</p><div className="modal-actions"><button className="button ghost" onClick={() => setConfirmFinish(false)}>Seguir entrenando</button><button className="button primary" onClick={() => finishSession(session.id)}>Finalizar sesión</button></div></div></div>}
     {paused && <button className="pause-overlay" onClick={() => setPaused(false)}><Play size={18} /> Continuar sesión</button>}

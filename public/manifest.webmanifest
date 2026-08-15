@@ -1,0 +1,11 @@
+{
+  "name": "GymFlow",
+  "short_name": "GymFlow",
+  "description": "Entrenamiento personal local y privado",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#101313",
+  "theme_color": "#c8f169",
+  "lang": "es",
+  "icons": []
+}

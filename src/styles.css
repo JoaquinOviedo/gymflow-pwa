@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
 
-:root { font-family: 'Manrope', system-ui, sans-serif; color: #ecf2ee; background: #101313; font-synthesis: none; text-rendering: optimizeLegibility; --bg: #101313; --surface: #171c1b; --surface-2: #202726; --line: rgba(233, 244, 237, .1); --text: #ecf2ee; --muted: #92a09a; --lime: #c8f169; --lime-dark: #19220e; --blue: #8fd6ff; --orange: #ffb878; --danger: #ff8585; --shadow: 0 18px 50px rgba(0,0,0,.16); }
-:root[data-theme='light'] { --bg: #f4f7f3; --surface: #ffffff; --surface-2: #edf2eb; --line: rgba(25, 42, 34, .12); --text: #17201b; --muted: #68766e; --lime-dark: #eff7dd; --shadow: 0 18px 50px rgba(25, 42, 34, .08); }
+:root { color-scheme: dark; font-family: 'Manrope', system-ui, sans-serif; color: #ecf2ee; background: #101313; font-synthesis: none; text-rendering: optimizeLegibility; --bg: #101313; --surface: #171c1b; --surface-2: #202726; --line: rgba(233, 244, 237, .1); --text: #ecf2ee; --muted: #92a09a; --lime: #c8f169; --lime-dark: #19220e; --blue: #8fd6ff; --orange: #ffb878; --danger: #ff8585; --shadow: 0 18px 50px rgba(0,0,0,.16); }
+:root[data-theme='light'] { color-scheme: light; --bg: #f4f7f3; --surface: #ffffff; --surface-2: #edf2eb; --line: rgba(25, 42, 34, .12); --text: #17201b; --muted: #68766e; --lime-dark: #eff7dd; --shadow: 0 18px 50px rgba(25, 42, 34, .08); }
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; background: var(--bg); color: var(--text); }
 button, input, select, textarea { font: inherit; }

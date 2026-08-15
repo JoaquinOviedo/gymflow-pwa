@@ -16,10 +16,19 @@ function App() {
   const [toast, setToast] = useState<string>()
   const [routinePanelOpen, setRoutinePanelOpen] = useState(false)
   const [settingsPanelOpen, setSettingsPanelOpen] = useState(false)
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>('dark')
 
   useEffect(() => { loadState(defaultState()).then((loaded) => { setState(loaded); setReady(true) }) }, [])
   useEffect(() => { if (ready) void saveState(state) }, [state, ready])
-  useEffect(() => { document.documentElement.dataset.theme = state.settings.theme === 'system' ? 'dark' : state.settings.theme; if ('serviceWorker' in navigator) void navigator.serviceWorker.register('/sw.js').catch(() => undefined) }, [state.settings.theme])
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)')
+    const syncSystemTheme = () => setSystemTheme(mediaQuery.matches ? 'light' : 'dark')
+    syncSystemTheme()
+    mediaQuery.addEventListener('change', syncSystemTheme)
+    return () => mediaQuery.removeEventListener('change', syncSystemTheme)
+  }, [])
+  const resolvedTheme = state.settings.theme === 'system' ? systemTheme : state.settings.theme
+  useEffect(() => { document.documentElement.dataset.theme = resolvedTheme; if ('serviceWorker' in navigator) void navigator.serviceWorker.register('/sw.js').catch(() => undefined) }, [resolvedTheme])
   useEffect(() => { if (!toast) return; const timer = window.setTimeout(() => setToast(undefined), 3200); return () => window.clearTimeout(timer) }, [toast])
 
   const activeSession = state.activeSession ? state.sessions.find((session) => session.id === state.activeSession?.sessionId) : undefined
@@ -45,7 +54,7 @@ function App() {
 
   if (!ready) return <div className="splash"><div className="brand-mark">G</div><p>Cargando tu espacio de entrenamiento…</p></div>
   return <div className="app-shell">
-    <header className="topbar"><button className="brand brand-button" onClick={() => navigate('dashboard')} aria-label="Ir al inicio"><span className="brand-mark">G</span><span>Gym<span>Flow</span></span></button><div className="top-actions">{page !== 'session' && <button className="icon-button" onClick={() => setSettingsPanelOpen(true)} aria-label="Configuración"><Settings size={19} /></button>}</div></header>
+    <header className="topbar"><button className="brand brand-button" onClick={() => navigate('dashboard')} aria-label="Ir al inicio"><span className="brand-mark">G</span><span>Gym<span>Flow</span></span></button><div className="top-actions"><button className="icon-button" onClick={() => setState((old) => ({ ...old, settings: { ...old.settings, theme: resolvedTheme === 'light' ? 'dark' : 'light' } }))} aria-label={resolvedTheme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'} title={resolvedTheme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}>{resolvedTheme === 'light' ? <Moon size={18} /> : <Sun size={18} />}</button>{page !== 'session' && <button className="icon-button" onClick={() => setSettingsPanelOpen(true)} aria-label="Configuración"><Settings size={19} /></button>}</div></header>
     <main className="page-wrap">{page === 'dashboard' && <Dashboard state={state} activeSession={activeSession} navigate={navigate} startSession={startSession} openPlan={() => setRoutinePanelOpen(true)} deleteSession={deleteSession} />}{page === 'session' && activeSession && <SessionView state={state} session={activeSession} updateSession={updateSession} finishSession={finishSession} navigate={navigate} />}</main>
     {routinePanelOpen && <div className="modal-backdrop"><Routines state={state} setState={setState} startSession={(routineId) => { setRoutinePanelOpen(false); startSession(routineId) }} navigate={navigate} inline onClose={() => setRoutinePanelOpen(false)} /></div>}
     {settingsPanelOpen && <div className="modal-backdrop"><section className="settings-panel"><div className="settings-panel-top"><div><p className="eyebrow lime">AJUSTES</p><h2>Configuración</h2></div><button className="icon-button subtle" onClick={() => setSettingsPanelOpen(false)} aria-label="Cerrar configuración"><X size={19} /></button></div><SettingsView state={state} setState={setState} /></section></div>}
